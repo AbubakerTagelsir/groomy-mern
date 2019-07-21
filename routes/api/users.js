@@ -15,6 +15,7 @@ const validateLoginInput = require("../../validation/login");
 
 //User model
 const User = require("../../models/User");
+const Customer = require("../../models/Customer");
 // router.get("/test", (req, res) => res.json({ msg: "Users Works" }));
 
 // route    POST /api/users/register
@@ -48,7 +49,19 @@ router.post("/register", (req, res) => {
           newUser.password = hash;
           newUser
             .save()
-            .then(user => res.json(user))
+            .then(user => {
+              const newCustomer = new Customer({
+                name: req.body.name,
+                email: req.body.email,
+                phone: req.body.phone,
+                avatar: avatar,
+                user: newUser.id
+              });
+              newCustomer.save().then(customer=>{
+                user.customer = customer.id;
+                return res.json({user:user,customer:customer});
+              });
+            })
             .catch(err => console.log(err));
         });
       });

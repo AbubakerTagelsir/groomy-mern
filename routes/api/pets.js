@@ -15,6 +15,7 @@ const PetBreed = require('../../models/PetBreed');
 
 //validators
 const ValidateBreedInput = require('../../validation/breed');
+const ValidatePetInput = require('../../validation/pet');
 
 const keys = require("../../config/keys");
 router.post('/newbreed', (req,res)=>{
@@ -33,16 +34,28 @@ router.post('/newbreed', (req,res)=>{
     });
     
 });
-router.post('/new', (req,res)=>{
-    newPet = new Pet({
-        name: req.body.name,
-        petType: req.body.petType,
-        gender: req.body.gender,
-        petBreed: req.body.petBreed,
-        birthdate: req.body.birthdate,
-        customer: req.body.customer
-    });
-});
+router.post('/new',
+            passport.authenticate('jwt', {session:false}), 
+            (req,res)=>{
+                const {errors, isValid} = ValidatePetInput(req.body);
+                if(!isValid){
+                    return res.status(404).json(errors)
+                }
+                console.log(req.user);
+                console.log(req.user.customer);
+                if(!req.user.customer){
+                    return res.status(404).json({nonCustomer: "There's no customer linked with this user!"})
+                }
+                const newPet = new Pet({
+                    name: req.body.name,
+                    petType: req.body.petType,
+                    gender: req.body.gender,
+                    petBreed: req.body.petBreed,
+                    birthdate: req.body.birthdate,
+                    customer: req.user.customer
+                });
+                newPet.save().then(pet=>res.json(pet)).catch(err=>res.status(400).json(err));
+            });
 router.get("/test", (req, res) => res.json({ msg: "pets Works" }));
 
 module.exports = router;

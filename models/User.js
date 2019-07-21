@@ -25,6 +25,10 @@ const UserSchema = new Schema({
     type: Boolean,
     default: true
   },
+  customer:{
+    type: Schema.Types.ObjectId,
+    ref: 'customers',
+},
   date: {
       type: Date,
       default: Date.now

@@ -26,7 +26,6 @@ const PetSchema = new Schema({
     petBreed: {
         type: Schema.Types.ObjectId,
         ref: 'petBreeds',
-        required: true
     },
     notes: {
         type: String,
