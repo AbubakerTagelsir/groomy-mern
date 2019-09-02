@@ -59,6 +59,7 @@ router.post("/register", (req, res) => {
               });
               newCustomer.save().then(customer=>{
                 user.customer = customer.id;
+                user.save();
                 return res.json({user:user,customer:customer});
               });
             })
